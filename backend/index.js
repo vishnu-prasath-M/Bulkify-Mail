@@ -10,14 +10,14 @@ app.use(cors())
 app.use (express.json())
 
 
-mongoose.connect("mongodb+srv://prasath:8925@cluster0.ngrgl.mongodb.net/mails?retryWrites=true&w=majority&appName=Cluster0").then(function(){
+mongoose.connect("mongodb+srv://prasathapr:prasath1234@cluster0.3pi8g.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0").then(function(){
     console.log("connected to DB")
 }).catch(function(){
     console.log("Failed to connect")
 })
 
 
-const credential = mongoose.model("credential",{},"datas")
+const credential = mongoose.model("credential",{},"userdetails")
 
 app.post("/sendmail",function(req,res)
 {   
