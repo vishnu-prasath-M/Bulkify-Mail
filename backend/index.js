@@ -1,78 +1,51 @@
-const express = require("express")
-const cors = require("cors")
-const nodemailer =require("nodemailer")
-const mongoose=require("mongoose")
+require('dotenv').config();
+const express = require("express");
+const cors = require("cors");
+const nodemailer = require("nodemailer");
+const mongoose = require("mongoose");
 
-const app =express()
+const app = express();
 
 // Middlewares
-app.use(cors())
-app.use (express.json())
+app.use(cors());
+app.use(express.json());
 
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("Connected to DB"))
+  .catch(() => console.log("Failed to connect"));
 
-mongoose.connect("mongodb+srv://prasathapr:prasath1234@cluster0.3pi8g.mongodb.net/users?retryWrites=true&w=majority&appName=Cluster0").then(function(){
-    console.log("connected to DB")
-}).catch(function(){
-    console.log("Failed to connect")
-})
+const credential = mongoose.model("credential", {}, "user_credential");
 
+app.post("/sendmail", function (req, res) {
+  const { msg, emailList, senderEmail, senderPassword } = req.body;
 
-const credential = mongoose.model("credential",{},"userdetails")
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: senderEmail,
+      pass: senderPassword,
+    },
+  });
 
-app.post("/sendmail",function(req,res)
-{   
-    var msg=req.body.msg
-    var emailList =req.body.emailList
-    
-    credential.find().then(function(data){
-        const transporter =nodemailer.createTransport({
-            service:"gmail",
-            auth:{
-                user:data[0].toJSON().user,
-                pass:data[0].toJSON().pass,
-            },
-    
+  new Promise(async (resolve, reject) => {
+    try {
+      for (let i = 0; i < emailList.length; i++) {
+        await transporter.sendMail({
+          from: senderEmail,
+          to: emailList[i],
+          subject: "A message from Bulkify Mail",
+          text: msg,
         });
+      }
+      resolve("success");
+    } catch (error) {
+      reject("failed");
+    }
+  })
+    .then(() => res.send(true))
+    .catch(() => res.send(false));
+});
 
-
-        new Promise(async function(resolve,reject){
-            try{
-                for(var i=0;i<emailList.length;i++)
-                    {
-                       await transporter.sendMail(
-                            {
-                                from:"prasathhari713@gmail.com",
-                                to:emailList[i],
-                                subject:"A message from Bulkify Mail",
-                                text:msg
-                            },
-                        
-                        )
-                
-                    }
-        
-                    resolve("success")
-            }
-            
-            catch(error)
-            {
-                reject("failed")
-            }
-        }).then(function(){
-            res.send(true)
-        }).catch(function(){
-            res.send(false)
-        })
-
-    }).catch(function(error){
-        console.log(error)
-    })
-   
-    
-  
-})
-
-
-app.listen(5000,function(){
-    console.log("Server started...")
-})
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server started on port ${PORT}...`))
