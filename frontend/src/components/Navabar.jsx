@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaBars, FaTimes, FaUserCog } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 import logo from "../assets/images/logo1.png"
 
@@ -31,7 +32,9 @@ const Navbar = () => {
         <a className="border-b-2 border-transparent hover:border-blue-500 transition p-2 " href="#">Features</a>
         <a className="border-b-2 border-transparent hover:border-blue-500 transition p-2" href="#About">About Us</a>
         <a className="border-b-2 border-transparent hover:border-blue-500 transition p-2" href="#">Contact Us</a>
-        <a className="border-b-2 border-transparent hover:border-blue-500 transition p-2" href="#">Pricing</a>
+        <Link className="border-b-2 border-transparent hover:border-blue-500 transition p-2" to="/pricing">
+  Pricing
+</Link>
         
         {/* Login/Signup Buttons for Small Screens */}
         <div className="md:hidden flex flex-col items-center gap-3 mt-4">
